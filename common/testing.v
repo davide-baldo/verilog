@@ -1,7 +1,6 @@
 `ifndef _H_UNIT_TESTING_
 `define _H_UNIT_TESTING_
 
-
 `define ASSERT_EQUALS(x,y) \
     repeat(1)\
     begin\
@@ -11,6 +10,5 @@
             $finish;\
         end\
     end 
-
 
 `endif

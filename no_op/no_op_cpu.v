@@ -1,10 +1,5 @@
 `include "testing.v"
-
-`define ARCH_SIZE 31
-`define INSTRUCTION_SIZE 16
-
-`define NOOP 0
-`define HALT 1
+`include "config.v"
 
 module no_op_cpu
 (
@@ -93,64 +88,5 @@ begin
   stop_clock = 0;
   mem_read = 0;
 end
-
-endmodule
-
-
-module cpu_user();
-
-reg clock;
-input stop_clock;
-input [`ARCH_SIZE:0] mem_address;
-reg   [`ARCH_SIZE:0] mem_value;
-wire mem_read;
-reg mem_ready;
-
-
-initial
-begin  
-  $display("starting cpu");  
-  mem_ready = 0;
-  clock = 0;
-  
-  while (!stop_clock)
-  begin
-    $display("clock");
-    clock = !clock;
-    #1 clock = !clock;
-  end
-  
-  $display("clock stopped");
-  $finish();
-end
-
-/*
-  memory emulator
-    return NOOP for addresses <= 16, HALT afterwards
-*/
-always @(mem_read)
-begin
-  if( mem_read == 0 )
-  begin
-    mem_ready <= 0;
-  end else
-  begin
-    //$display( "mem_address: %d, read: %d, ready: %d",mem_address, mem_read, mem_ready);
-    if( mem_address <= 16 )
-      mem_value <= `NOOP;
-    else
-      mem_value <= `HALT;
-    mem_ready <= 1;
-  end
-end
-
-no_op_cpu cpu(
-  clock,
-  stop_clock,
-  mem_address,
-  mem_value,
-  mem_read,
-  mem_ready
-);
 
 endmodule
