@@ -4,18 +4,15 @@
 `include "conf.sv"
 
 interface MemoryAccessor();
-  logic [`ARCH_SIZE_1:0] address;
-  logic [7:0] value;
-  logic read;
-  logic write;
   logic ready;
+  logic [`ARCH_SIZE_1:0] address;
   
-  initial
-  begin
-    write = 0;
-    read  = 0;
-    ready = 0;
-  end
+  logic read;
+  logic [7:0] read_value;
+  
+  logic write;  
+  logic [7:0] write_value;
+  
 endinterface
 
 

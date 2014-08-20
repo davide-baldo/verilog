@@ -1,38 +1,29 @@
-/* verilator lint_off WIDTH */
-/* verilator lint_off COMBDLY */
+
 /* verilator lint_off UNOPTFLAT */
 
 `include "conf.sv"
 `include "memory.sv"
 
 module FixedMemory(MemoryAccessor accessor);
-
-  bit [7:0] memory [127:0];
-
-  always @(*)
+  byte memory [127:0];
+  
+  always_ff @(accessor.write or accessor.read)
   begin
     if (accessor.read)
     begin
       $display("read");
-      accessor.value = memory[ accessor.address ];    
+      accessor.read_value = memory[ 7'(accessor.address) ];    
       accessor.ready = 1;
-    end
-  end
-  
-  always @(*)
-  begin
+    end else
     if (accessor.write)
     begin
       $display("write");
-      memory[ accessor.address ] = accessor.value;
+      memory[ 7'(accessor.address) ] = accessor.write_value;
       accessor.ready = 1;
-    end
-  end
-  
-  always @(*)
-  begin
-    if ( !(accessor.read|accessor.write) )
+    end else
+    begin
       accessor.ready = 0;
+    end
   end
 
 endmodule
@@ -41,8 +32,8 @@ endmodule
 module test;
 
   int stage;
-  int randomValue;
-  int randomAddress;
+  byte randomValue;
+  bit [`ARCH_SIZE_1:0] randomAddress;
   
   MemoryAccessor accessor;
   FixedMemory mem(accessor);
@@ -55,29 +46,28 @@ module test;
     stage = 1;
   end
 
-  always @(posedge accessor.ready)
+  always_ff @(posedge accessor.ready)
   begin
     case (stage)
       1: begin
         `ASSERT_EQUALS( 1, accessor.ready );
-        accessor.value = 0;
-        accessor.write = 0;        
-        stage++;
+        accessor.write = 0;
+        stage = stage+1;
       end
       2: begin
         `ASSERT_EQUALS( 1, accessor.ready );
-        `ASSERT_EQUALS( randomValue, accessor.value );
-        stage++;
+        `ASSERT_EQUALS( randomValue, accessor.read_value );
+        stage = stage+1;
       end
     endcase      
   end
 
-  always @(stage)
+  always_ff @(stage)
   begin  
-    $display("stage %d, val %d, addr %d, write %d, read %d, ready %d", stage, accessor.value, accessor.address, accessor.write, accessor.read, accessor.ready );
+    $display("stage %d, read_value %d, write_value %d, addr %d, write %d, read %d, ready %d", stage, accessor.read_value, accessor.write_value, accessor.address, accessor.write, accessor.read, accessor.ready );
     case (stage)
       1: begin
-        accessor.value = randomValue;
+        accessor.write_value = randomValue;
         accessor.address = randomAddress;
         accessor.write = 1; 
       end
