@@ -6,7 +6,7 @@
     begin\
         if( (x) !== (y) ) \
         begin\
-            $write( "%s:%d failed: excepted %d but was %d\n", `__FILE__, `__LINE__, (x), (y) );\
+            $write( "%s:%d failed: expected %d but was %d\n", `__FILE__, `__LINE__, (x), (y) );\
             $finish;\
         end\
     end 

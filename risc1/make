@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e
+
+cd obj_dir
+g++ -DVL_USER_FINISH *.cpp *.h ../main.cpp /usr/share/verilator/include/verilated.cpp -I . -I /usr/share/verilator/include/ -O0 -g -lm -lstdc++ -o ../sim
