@@ -3,7 +3,17 @@
 
 `include "conf.sv"
 
-interface MemoryAccessor();
+interface MemoryAccessor(
+  input ready,
+  output address,
+  
+  output read,
+  input read_value,
+  
+  output write,  
+  output write_value
+);
+
   logic ready;
   logic [`ARCH_SIZE_1:0] address;
   

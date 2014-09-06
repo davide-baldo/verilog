@@ -28,6 +28,7 @@ module FixedMemory(MemoryAccessor accessor);
 
 endmodule
 
+
 `include "../common/testing.v"
 module test;
 
@@ -48,6 +49,7 @@ module test;
 
   always_ff @(posedge accessor.ready)
   begin
+    $display("ready!");
     case (stage)
       1: begin
         `ASSERT_EQUALS( 1, accessor.ready );

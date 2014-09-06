@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#rm -f obj_dir/* && verilator --cc  test_01.sv -I../common/  --top-module test_01 && ./make && ./sim
 set -e
 
 cd obj_dir

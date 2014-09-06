@@ -26,7 +26,11 @@ typedef enum bit [4:0]
   TNSET  = 20,
   CALL   = 21,
   RET    = 22,
-  HALT   = 23
+  INT    = 23,
+  INTI   = 24,
+  RETIN  = 25,
+  SET    = 26,
+  HALT   = 31
 } OpcodeId;
 
 typedef enum bit [2:0]
