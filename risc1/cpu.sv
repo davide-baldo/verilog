@@ -1,7 +1,7 @@
 `include "conf.sv"
-`include "testing.v"
+`include "testing.sv"
 
-module no_op_cpu
+module cpu
 (
   clock,
   stop_clock,  

@@ -1,11 +1,11 @@
 //#include "Vfixed_memory.h"
-#include "Vtest_01.h"
-#include "Vtest_01_MemoryAccessor.h"
+#include "Vtest.h"
+#include "Vtest_MemoryAccessor.h"
 #include "verilated.h"
 #include <assert.h>
 
-#define TOP Vtest_01
-#define MEMORY Vtest_01_MemoryAccessor
+#define TOP Vtest
+#define MEMORY Vtest_MemoryAccessor
 
 #include <stdlib.h>
 

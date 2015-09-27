@@ -54,8 +54,8 @@ typedef struct packed
   {
     struct packed
     {
-      bit [4:0] arg1;
-      bit [4:0] arg2;
+      bit [3:0] arg1;
+      bit [3:0] arg2;
     } splitted;    
     bit [7:0] whole;    
   } args;

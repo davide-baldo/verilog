@@ -1,3 +1,4 @@
+/* verilator lint_off UNOPTFLAT */
 `ifndef _H_MEMORY_
 `define _H_MEMORY_
 
