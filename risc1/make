@@ -5,15 +5,19 @@ cd $(dirname $0)
 pwd
 
 mkdir -p out/
+rm -rf obj_dir;
 
-for TEST in tests/*; do
-    TEST_NAME=$(echo ${TEST}|sed -E "s/tests\/(.*)_test.sv/\1/");
+verilator --cc tests/test_base.sv -I.. -Itests/ --top-module test
+
+cd obj_dir
+
+for TEST in ../tests/*; do
+    TEST_NAME=$(echo ${TEST}|sed -E "s/..\/tests\/(.*)_test.h/\1/");
     if echo ${TEST} | grep _test >/dev/null; then
         echo "Compiling ${TEST}";
-        rm -rf obj_dir;
-        verilator --cc "${TEST}" -I.. -Itests/ --top-module test
-        cd obj_dir
-        g++ -DVL_USER_FINISH *.cpp *.h ../main.cpp /usr/share/verilator/include/verilated.cpp -I . -I /usr/share/verilator/include/ -O0 -g -lm -lstdc++ -o "../out/${TEST_NAME}.test"
+        mkdir tmp/
+        cp "${TEST}" tmp/current_test.h
+        g++ -DVL_USER_FINISH -Itmp/ *.cpp ../main.cpp /usr/share/verilator/include/verilated.cpp -I . -I /usr/share/verilator/include/ -O0 -lm -lstdc++ -o "../out/${TEST_NAME}.test"
         cd ..
         echo "Created out/$TEST_NAME.test";
     fi;

@@ -9,7 +9,7 @@ module cpu
 );
 
 `define NOOP 0
-`define HALT 1
+`define HALT 31
 
 input clock;
 output stop_clock;

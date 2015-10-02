@@ -2,6 +2,7 @@
 #include "Vtest.h"
 #include "Vtest_MemoryAccessor.h"
 #include "verilated.h"
+#include "opcode.h"
 #include <assert.h>
 
 #define TOP Vtest
@@ -79,11 +80,29 @@ class Memory
       mRawMemory[address+1] = (value << 8) & 0xff;
     }
     
+    void writeOpcode(
+      unsigned int address,
+      OpcodeId id,
+      OpcodeCondition cond
+    )
+    {
+      write16(
+        address,
+        (id & 0x1F) | ((cond & 0x07) << 5)
+      );
+    }
+      
+    
   private:
     const unsigned int mSize;
     char *mRawMemory;
 };
 
+#include "current_test.h"
+
+#ifndef MAX_TICKS
+#define MAX_TICKS 25
+#endif
 
 int main(int argc, char **argv, char **env)
 {
@@ -94,13 +113,12 @@ int main(int argc, char **argv, char **env)
   top->stop_clock = 0;  
   
   Memory memory(128);
-  
   memory.initialize(top);
-  memory.write16( 0x0, 0 );
-  memory.write16( 0x2, 0 );
-  memory.write16( 0x4, 1 );
+
+  initMemory(memory);
   
-  for (int n=25; n >0; --n)
+  int n=MAX_TICKS;
+  for (; n >0; --n)
   {
     top->clock = !top->clock;
     top->eval();
@@ -115,11 +133,15 @@ int main(int argc, char **argv, char **env)
   }
   
   delete top;
+ 
+  assertMemory(memory);
   
-  if( !Verilated::gotFinish() )
+/*
+ if( !Verilated::gotFinish() )
   {
     return EXIT_FAILURE;
   }
+ */
   
   return EXIT_SUCCESS;
 }
