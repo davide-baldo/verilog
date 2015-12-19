@@ -10,12 +10,12 @@ rm -rf obj_dir;
 verilator --cc tests/test_base.sv -I.. -Itests/ --top-module test
 
 cd obj_dir
+mkdir tmp/
 
 for TEST in ../tests/*; do
     TEST_NAME=$(echo ${TEST}|sed -E "s/..\/tests\/(.*)_test.h/\1/");
     if echo ${TEST} | grep _test >/dev/null; then
         echo "Compiling ${TEST}";
-        mkdir tmp/
         cp "${TEST}" tmp/current_test.h
         g++ -DVL_USER_FINISH -Itmp/ *.cpp ../main.cpp /usr/share/verilator/include/verilated.cpp -I . -I /usr/share/verilator/include/ -O0 -lm -lstdc++ -o "../out/${TEST_NAME}.test"
         cd ..

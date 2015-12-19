@@ -73,6 +73,12 @@ class Memory
       }
     }
     
+    int read8(unsigned int address)
+    {
+      assert( address < mSize-1 );
+      return mRawMemory[address];
+    }
+    
     void write16(unsigned int address, int value)
     {
       assert( address < mSize-1 );
@@ -89,6 +95,35 @@ class Memory
       write16(
         address,
         (id & 0x1F) | ((cond & 0x07) << 5)
+      );
+    }
+    
+    void writeOpcode(
+      unsigned int address,
+      OpcodeId id,
+      OpcodeCondition cond,
+      int arg1,
+      int arg2
+    )
+    {
+      write16(
+        address,
+        (id & 0x1F) | ((cond & 0x07) << 5) |
+        ((arg1 & 0x0F) >> 8) | ((arg1 & 0x0F) >> 12)
+      );
+    }
+    
+    void writeOpcode(
+      unsigned int address,
+      OpcodeId id,
+      OpcodeCondition cond,
+      int argWhole
+    )
+    {
+      write16(
+        address,
+        (id & 0x1F) | ((cond & 0x07) << 5) |
+        ((argWhole & 0xFF) >> 8)
       );
     }
       

@@ -33,6 +33,12 @@ typedef enum bit [4:0]
   HALT   = 31
 } OpcodeId;
 
+typedef enum bit [3:0]
+{
+  REG1 = 0,
+  REG2 = 1
+} RegisterId;
+
 typedef enum bit [2:0]
 {
   ALWAYS          = 0,
