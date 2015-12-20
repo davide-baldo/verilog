@@ -39,10 +39,12 @@ class Memory
     
     void initialize( TOP *top )
     {
-      top->ready = 0;
+      top->read_ready = 0;
+      top->write_ready = 0;
       top->read = 0;
       top->write = 0;
-      top->address = 0;
+      top->read_address = 0;
+      top->write_address = 0;
       top->read_value = 0;
       top->write_value = 0;
     }
@@ -51,26 +53,45 @@ class Memory
     {
       //printf("read: %i write: %i address: %lx ready: %i\n", top->read, top->write, top->address, top->ready);
       
-      assert( !(top->write && top->read) );
-      
       if( top->write )
       {
-        assert( top->address < mSize );
-        mRawMemory[top->address] = top->write_value;
-        top->ready = 1;
+        printf("writing: addr: %02llx value: %02x\n", top->write_address, top->write_value);
+        assert( top->write_address+1 < mSize-1 );
+        mRawMemory[top->write_address] = top->write_value;
+        mRawMemory[top->write_address+1] = (top->write_value >> 8) & 0xFF;
+        top->write_ready = 1;
+      }
+      else
+      {
+        top->write_ready = 0;
       }
       
       if( top->read )
       {
-        assert( top->address < mSize );
-        top->read_value = mRawMemory[top->address];
-        top->ready = 1;
+        assert( top->read_address + 1 < mSize );
+        top->read_value = mRawMemory[top->read_address] << 8 |
+                          mRawMemory[top->read_address+1];
+        top->read_ready = 1;
       }
-      
-      if( !top->read && !top->write )
+      else
       {
-        top->ready = 0;
+        top->read_ready = 0;
       }
+    }
+    
+    void dump(int howMany)
+    {
+      for(int count=0; count < howMany; ++count)
+      {
+        if( count % 16 == 0 )
+        {
+          printf("\n");
+        }
+        printf("%02x ", mRawMemory[howMany]);
+      }
+      printf("\n");
+      
+      fflush(stdout);
     }
     
     int read8(unsigned int address)
@@ -82,6 +103,7 @@ class Memory
     void write16(unsigned int address, int value)
     {
       assert( address < mSize-1 );
+      printf("Writig in 0x%02x: 0x%02x\n",address, value);
       mRawMemory[address] = value & 0xff;
       mRawMemory[address+1] = (value << 8) & 0xff;
     }
@@ -126,6 +148,20 @@ class Memory
         ((argWhole & 0xFF) >> 8)
       );
     }
+    
+    void writeOpcode(
+      unsigned int address,
+      Opcode opcode
+    )
+    {
+      char buffer[2];
+      opcode.write(buffer);
+      
+      assert( address < mSize-1 );
+      printf("Writig in 0x%02x: 0x%02x - 0x%02x\n",address, buffer[0], buffer[1]);
+      mRawMemory[address] = buffer[0];
+      mRawMemory[address+1] = buffer[1];
+    }
       
     
   private:
@@ -141,6 +177,8 @@ class Memory
 
 int main(int argc, char **argv, char **env)
 {
+  printf("sizeof(Opcode): %i\n",sizeof(Opcode));
+
   Verilated::commandArgs(argc, argv);
   
   TOP* top = new TOP;  

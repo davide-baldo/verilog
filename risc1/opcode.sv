@@ -1,7 +1,7 @@
 `ifndef _H_OPCODE_
 `define _H_OPCODE_
 
-typedef enum bit [4:0]
+typedef enum bit [5:0]
 {
   NOOP   = 0,
   ADD    = 1,
@@ -30,7 +30,8 @@ typedef enum bit [4:0]
   INTI   = 24,
   RETIN  = 25,
   SET    = 26,
-  HALT   = 31
+  HALT   = 31,
+  XOR    = 32
 } OpcodeId;
 
 typedef enum bit [3:0]
@@ -39,16 +40,16 @@ typedef enum bit [3:0]
   REG2 = 1
 } RegisterId;
 
-typedef enum bit [2:0]
+typedef enum bit [1:0]
 {
-  ALWAYS          = 0,
-  EQUALS          = 1,
-  POSITIVE        = 2,
-  NEGATIVE        = 3,
-  OVERFLOW        = 4,
+  ALWAYS              = 0,
+  EQUALS_OR_OVERFLOW  = 1,
+  POSITIVE            = 2,
+  NEGATIVE            = 3
+ /*
   EQUALS_POSITIVE = 5,
   EQUALS_NEGATIVE = 6,
-  UNUSED          = 7
+  NEVER           = 7*/
 } OpcodeCondition;
 
 // 2 bytes opcode

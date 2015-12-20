@@ -1,10 +1,15 @@
 
 void initMemory(Memory &memory)
 {
-  memory.writeOpcode( 0x0, ADD, ALWAYS );
-  memory.writeOpcode( 0x2, NOOP, ALWAYS );
-  memory.writeOpcode( 0x4, NOOP, ALWAYS );
-  memory.writeOpcode( 0x6, HALT, ALWAYS );
+  memory.writeOpcode(
+    0x0,
+    Opcode(ALWAYS, NOOP)
+  );
+  
+  memory.writeOpcode(
+    0x2,
+    Opcode(ALWAYS, HALT)
+  );
 }
 
 void assertMemory(Memory &memory)

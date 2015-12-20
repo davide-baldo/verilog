@@ -8,14 +8,17 @@ module test(
   input clock,
   output stop_clock,
   
-  input ready,
-  output [`ARCH_SIZE_1:0] address,
+  input read_ready,
+  output [`ARCH_SIZE_1:0] read_address,
+  
+  input write_ready,
+  output [`ARCH_SIZE_1:0] write_address,
   
   output read,
-  input [7:0] read_value,
+  input [15:0] read_value,
   
   output write,  
-  output [7:0] write_value
+  output [15:0] write_value
 );
   int stage;
   byte randomValue;
@@ -24,8 +27,10 @@ module test(
   Opcode opcode;
   
   MemoryAccessor accessor(
-    ready, 
-    address, 
+    read_ready, 
+    read_address, 
+    write_ready,
+    write_address,
     read,
     read_value, 
     write, 

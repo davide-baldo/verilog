@@ -18,7 +18,6 @@ for TEST in ../tests/*; do
         echo "Compiling ${TEST}";
         cp "${TEST}" tmp/current_test.h
         g++ -DVL_USER_FINISH -Itmp/ *.cpp ../main.cpp /usr/share/verilator/include/verilated.cpp -I . -I /usr/share/verilator/include/ -O0 -lm -lstdc++ -o "../out/${TEST_NAME}.test"
-        cd ..
         echo "Created out/$TEST_NAME.test";
     fi;
 done;
