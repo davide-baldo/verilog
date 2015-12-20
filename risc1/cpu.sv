@@ -18,17 +18,16 @@ reg stop_clock;
 */
 reg [`ARCH_SIZE_1:0] [15:0] registers;
 reg [`ARCH_SIZE_1:0] cpu_ip;
-integer stage;
-Opcode cpu_current_opcode;
+
+Opcode current_opcode;
+Opcode next_opcode;
 
 task fetch_instruction;
   input  [`ARCH_SIZE_1:0] address;
-  output [15:0] destination;
   begin
     `ASSERT_EQUALS(0,memory.read);
     memory.read_address <= address;
     memory.read = 1;
-    $display("read <= 1");
   end
 endtask
 
@@ -37,9 +36,8 @@ begin
   if( memory.read )
   begin
     `ASSERT_EQUALS(1,memory.read);
-    cpu_current_opcode = memory.read_value;    
+    next_opcode = memory.read_value;    
     memory.read = 0;
-    $display("read <= 0");
   end
 end
 
@@ -57,7 +55,12 @@ task exec_opcode;
   
     case( opcode.id )
       NOOP: ;
-      HALT: stop_clock = 1;
+      HALT:
+      begin
+        $display("HALT");
+        stop_clock <= 1;
+      end
+      
       ADDI:
       begin
         $display(
@@ -66,10 +69,9 @@ task exec_opcode;
           registers[opcode.args.splitted.arg1],
           opcode.args.splitted.arg2
         );
-        registers[opcode.args.splitted.arg1] = 
+        registers[opcode.args.splitted.arg1] <= 
           registers[opcode.args.splitted.arg1] +
           opcode.args.splitted.arg2;
-        $display("Result: %d", registers[opcode.args.splitted.arg1]);
       end
       
       STORE:
@@ -86,7 +88,7 @@ task exec_opcode;
       
       XOR:
       begin
-        registers[opcode.args.splitted.arg1] = 
+        registers[opcode.args.splitted.arg1] <= 
           registers[opcode.args.splitted.arg1] ^ 
           registers[opcode.args.splitted.arg2];
       end
@@ -96,28 +98,18 @@ endtask
 
 always @(posedge clock)
 begin
-  $display("stage: %d, opcode: %x, id: %d, ip: %d", stage, cpu_current_opcode, cpu_current_opcode.id, cpu_ip);
-  case( stage )
-    0:if( !memory.read )
-      begin
-        fetch_instruction(cpu_ip, cpu_current_opcode);
-        stage <= 1;
-        cpu_ip <= cpu_ip + 2;
-      end
-      
-    1:if( !memory.read )
-      begin
-        exec_opcode(cpu_current_opcode);
-        stage <= 0;        
-      end 
-    endcase
+  current_opcode = next_opcode;
+  $display("opcode: %x, id: %d, next_ip: %d", current_opcode, current_opcode.id, cpu_ip);
+  fetch_instruction(cpu_ip);
+  cpu_ip = cpu_ip + 2;
+  exec_opcode(current_opcode);
 end
 
 initial
 begin
-  stage = 0;
   cpu_ip = 0;
   stop_clock = 0;
+  next_opcode[15:0] = 0; 
 end
 
 endmodule
